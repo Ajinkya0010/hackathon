@@ -19,6 +19,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import View, FormView
 from django.conf import settings
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import HttpResponseNotAllowed
+
 
 from .utils import (
     send_activation_email, send_reset_password_email, send_forgotten_username_email, send_activation_change_email,
@@ -42,8 +46,32 @@ import json
 
 from .models import ImageModel
 from django.shortcuts import get_object_or_404,get_list_or_404
+from .serializers import PatientSerializer
 
 
+@csrf_exempt
+def addPatient(request):
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            name = data.get('name')
+            age = data.get('age')
+            emergencyContact = data.get('emergencyContact')
+            caretakerId = data.get('caretakerId')
+            pincode = data.get('pincode')
+            
+            patient = Patient.objects.create(
+                name=name,
+                age = age,
+                emergencyContact =emergencyContact,
+                caretakerId= caretakerId,
+                pincode=pincode )
+            
+            return JsonResponse({'message': 'data saved successfully'}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+            
+        
 @csrf_exempt
 def upload_image(request):
     if request.method == 'POST':

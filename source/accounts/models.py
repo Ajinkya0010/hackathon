@@ -4,14 +4,14 @@ import datetime
 
 class Patient(models.Model):
     patientId = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    age = models.IntegerField()
-    emergencyContact = models.CharField(max_length=100)
-    caretakerId = models.CharField(max_length=50, default='') 
+    name = models.CharField(max_length=100,null=True)
+    age = models.IntegerField(null=True)
+    emergencyContact = models.CharField(max_length=100,null=True)
+    caretakerId = models.CharField(max_length=50, default='',null=True) 
     pincode = models.CharField(max_length=20,null=True)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 class Activation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

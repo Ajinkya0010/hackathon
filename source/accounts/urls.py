@@ -4,12 +4,13 @@ from .views import (
     LogInView, ResendActivationCodeView, RemindUsernameView, SignUpView, ActivateView, LogOutView,
     ChangeEmailView, ChangeEmailActivateView, ChangeProfileView, ChangePasswordView,
     RestorePasswordView, RestorePasswordDoneView, RestorePasswordConfirmView, LogOutConfirmView, 
-    getAllPatientDetails, upload_image, get_image, get_survey_data, store_survey
+    getAllPatientDetails, upload_image, get_image, get_survey_data, store_survey, addPatient
 )
 
 app_name = 'accounts'
 
 urlpatterns = [
+    path('addPatient/',addPatient,name='addPatient'),
     path('getAllPatientDetails/', getAllPatientDetails, name='getAllPatientDetails'),
     path('get-survey-data/', get_survey_data, name='get_survey_data'),
     path('store-survey',store_survey,name='store_survey'),
