@@ -36,21 +36,21 @@ class ImageModel(models.Model):
 class SurveyModel(models.Model):
     id = models.AutoField(primary_key=True)
     patientId = models.IntegerField(null=True)
-    createDate =  models.DateField(auto_now_add=True)
-    memory = models.IntegerField(null=True)
-    orientation = models.IntegerField(null=True)
-    judgment = models.IntegerField(null=True)
-    community = models.IntegerField(null=True)
-    hobbies = models.IntegerField(null=True)
-    personalCare = models.IntegerField(null=True)
-    cdrValues = models.IntegerField(null=True)   
+    createDate =  models.DateField()
+    memory = models.FloatField(null=True)
+    orientation = models.FloatField(null=True)
+    judgment = models.FloatField(null=True)
+    community = models.FloatField(null=True)
+    hobbies = models.FloatField(null=True)
+    personalCare = models.FloatField(null=True)
+    cdrValues = models.FloatField(null=True)   
 
     def __str__(self):
         return str(self.id)
 
-    def save(self, *args, **kwargs):
-        # Ensure createDate is formatted as dd-mm-yyyy before saving
-        self.createDate = datetime.datetime.now().strftime('%d-%m-%Y')
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     # Ensure createDate is formatted as dd-mm-yyyy before saving
+    #     self.createDate = datetime.datetime.now().strftime('%d-%m-%Y')
+    #     super().save(*args, **kwargs)
 
     

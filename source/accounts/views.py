@@ -119,6 +119,7 @@ def store_survey(request):
             community = data.get('community')
             hobbies = data.get('hobbies')
             personal_care = data.get('personalCare')
+            createDate = datetime.datetime.now().strftime('%Y-%m-%d')
             print(data,patient_id,memory)
             # Create SurveyModel instance
             survey = SurveyModel.objects.create(
@@ -129,6 +130,7 @@ def store_survey(request):
                 community=community,
                 hobbies=hobbies,
                 personalCare=personal_care,
+                createDate=createDate
             )
             # Return success response
             return JsonResponse({'message': 'Survey data saved successfully'}, status=201)
