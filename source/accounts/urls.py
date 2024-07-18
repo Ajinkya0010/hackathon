@@ -3,12 +3,19 @@ from django.urls import path
 from .views import (
     LogInView, ResendActivationCodeView, RemindUsernameView, SignUpView, ActivateView, LogOutView,
     ChangeEmailView, ChangeEmailActivateView, ChangeProfileView, ChangePasswordView,
-    RestorePasswordView, RestorePasswordDoneView, RestorePasswordConfirmView, LogOutConfirmView,
+    RestorePasswordView, RestorePasswordDoneView, RestorePasswordConfirmView, LogOutConfirmView, 
+    getAllPatientDetails, upload_image, get_image, get_survey_data, store_survey
 )
 
 app_name = 'accounts'
 
 urlpatterns = [
+    path('getAllPatientDetails/', getAllPatientDetails, name='getAllPatientDetails'),
+    path('get-survey-data/', get_survey_data, name='get_survey_data'),
+    path('store-survey',store_survey,name='store_survey'),
+    path('upload/', upload_image, name='upload_image'),
+    path('get/', get_image, name='get_image'),
+
     path('log-in/', LogInView.as_view(), name='log_in'),
     path('log-out/confirm/', LogOutConfirmView.as_view(), name='log_out_confirm'),
     path('log-out/', LogOutView.as_view(), name='log_out'),

@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     
     # Vendor apps
     'bootstrap4',
-
+    'rest_framework',
     # Application apps
     'main',
     'accounts',

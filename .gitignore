@@ -7,5 +7,6 @@ source/content/static/
 
 env/
 tmp/
+myenv/
 
 db.sqlite3

@@ -7,7 +7,7 @@ from django.contrib.auth.views import (
     PasswordResetDoneView as BasePasswordResetDoneView, PasswordResetConfirmView as BasePasswordResetConfirmView,
 )
 from django.views.generic.base import TemplateView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.crypto import get_random_string
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme as is_safe_url
@@ -28,7 +28,131 @@ from .forms import (
     RestorePasswordForm, RestorePasswordViaEmailOrUsernameForm, RemindUsernameForm,
     ResendActivationCodeForm, ResendActivationCodeViaEmailForm, ChangeProfileForm, ChangeEmailForm,
 )
-from .models import Activation
+from .models import (Activation,Patient, SurveyModel)
+
+from rest_framework.decorators import api_view
+
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+import base64
+from django.core.files.base import ContentFile
+import datetime
+import pytz
+import json
+
+from .models import ImageModel
+from django.shortcuts import get_object_or_404,get_list_or_404
+
+
+@csrf_exempt
+def upload_image(request):
+    if request.method == 'POST':
+        # Assuming the data is sent as JSON from React
+        patient_id = request.POST.get('patientId')
+        image_file = request.FILES.get('image')
+
+        # Create and save the ImageModel instance
+        image_instance = ImageModel(patientId=patient_id, image=image_file.read())
+        image_instance.save()
+
+        return JsonResponse({'message': 'Image uploaded successfully!'})
+
+    return JsonResponse({'error': 'Invalid request method'})
+
+@csrf_exempt
+def get_image(request):
+    if request.method == 'GET':
+        patient_id = request.GET.get('patientId')
+        create_date_str = request.GET.get('createDate')
+
+        # Convert createDate string to datetime object
+        create_date = datetime.datetime.strptime(create_date_str, '%d-%m-%Y').date()
+
+        # Retrieve the image instance based on patientId and createDate
+        image_instance = get_object_or_404(ImageModel, patientId=patient_id,createDate=create_date)
+
+        # Return the image binary data as a response
+        response = HttpResponse(image_instance.image, content_type='image/jpeg')  # Adjust content_type as per your image type
+        response['Content-Disposition'] = 'attachment; filename="image.jpg"'  # Adjust filename and extension
+        return response
+
+    return JsonResponse({'error': 'Invalid request method'})
+
+@csrf_exempt
+def store_survey(request):
+    if request.method == 'POST':
+        try:
+            # Parse JSON data from request body
+            data = request.POST  # Use request.POST for form data or request.body for JSON data
+            patient_id = data.get('patientId')
+            memory = data.get('memory')
+            orientation = data.get('orientation')
+            judgment = data.get('judgment')
+            community = data.get('community')
+            hobbies = data.get('hobbies')
+            personal_care = data.get('personalCare')
+            print(data,patient_id,memory)
+            # Create SurveyModel instance
+            survey = SurveyModel.objects.create(
+                patientId=patient_id,
+                memory=memory,
+                orientation=orientation,
+                judgment=judgment,
+                community=community,
+                hobbies=hobbies,
+                personalCare=personal_care,
+            )
+            # Return success response
+            return JsonResponse({'message': 'Survey data saved successfully'}, status=201)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return HttpResponseNotAllowed(['POST'])
+
+@csrf_exempt
+def get_survey_data(request):
+    if request.method == 'GET':
+        patient_id = request.GET.get('patientId')
+
+        if not patient_id:
+            return JsonResponse({'error': 'Missing patientId parameter'}, status=400)
+
+        try:
+            # Retrieve list of SurveyModel instances for given patientId
+            surveys = get_list_or_404(SurveyModel, patientId=patient_id)
+
+            # Prepare response data
+            survey_data = []
+            for survey in surveys:
+                survey_data.append({
+                    'patientId': survey.patientId,
+                    'cdrValue': survey.cdrValues,
+                    'createDate': survey.createDate.strftime('%d-%m-%Y')  # Format date as dd-mm-yyyy
+                })
+
+            # Return JSON response with survey data
+            return JsonResponse(survey_data, safe=False)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return HttpResponseNotAllowed(['GET'])
+
+
+@api_view(['GET'])
+def getAllPatientDetails(request):
+    caretaker_id = request.query_params.get('caretakerId', None)
+    if caretaker_id is None:
+        return Response({"error": "caretakerId parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    patients = Patient.objects.filter(caretakerId=caretaker_id)
+    if not patients.exists():
+        return Response({"error": "No patients found for the given caretakerId"}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = PatientSerializer(patients, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class GuestOnlyView(View):
