@@ -156,9 +156,9 @@ def get_survey_data(request):
             survey_data = []
             for survey in surveys:
                 survey_data.append({
-                    'patientId': survey.patientId,
+                    # 'patientId': survey.patientId,
                     'cdrValue': survey.cdrValues,
-                    'createDate': survey.createDate.strftime('%d-%m-%Y')  # Format date as dd-mm-yyyy
+                    'createDate': survey.createDate.strftime('%Y-%m-%d')  # Format date as dd-mm-yyyy
                 })
 
             # Return JSON response with survey data
