@@ -87,6 +87,24 @@ def upload_image(request):
 
     return JsonResponse({'error': 'Invalid request method'})
 
+@api_view(['GET'])
+def getPatientDetails(request):
+    if request.method == 'GET':
+        patient_id = request.GET.get('patientId')
+
+        if patient_id is None:
+            return Response({"error": "patientId parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch the patient details
+        patients = Patient.objects.filter(patientId=patient_id)
+        if not patients.exists():
+            return Response({"error": "No patients found for the given patientId"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Serialize the patient data
+        serializer = PatientSerializer(patients, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+ 
 @csrf_exempt
 def get_image(request):
     if request.method == 'GET':

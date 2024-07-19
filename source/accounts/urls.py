@@ -1,4 +1,5 @@
 from django.urls import path
+from .views import getPatientDetails
 
 from .views import (
     LogInView, ResendActivationCodeView, RemindUsernameView, SignUpView, ActivateView, LogOutView,
@@ -16,6 +17,7 @@ urlpatterns = [
     path('store-survey',store_survey,name='store_survey'),
     path('upload/', upload_image, name='upload_image'),
     path('get/', get_image, name='get_image'),
+    path('getPatientDetails/', getPatientDetails, name='getPatientDetails'),
 
     path('log-in/', LogInView.as_view(), name='log_in'),
     path('log-out/confirm/', LogOutConfirmView.as_view(), name='log_out_confirm'),
