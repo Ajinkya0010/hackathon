@@ -43,6 +43,7 @@ from django.core.files.base import ContentFile
 import datetime
 import pytz
 import json
+import random
 
 from .models import ImageModel
 from django.shortcuts import get_object_or_404,get_list_or_404
@@ -65,7 +66,8 @@ def addPatient(request):
                 age = age,
                 emergencyContact =emergencyContact,
                 caretakerId= caretakerId,
-                pincode=pincode )
+                pincode=pincode 
+            )
             
             return JsonResponse({'message': 'data saved successfully'}, status=201)
         except Exception as e:
@@ -99,7 +101,7 @@ def getPatientDetails(request):
         patients = Patient.objects.filter(patientId=patient_id)
         if not patients.exists():
             return Response({"error": "No patients found for the given patientId"}, status=status.HTTP_404_NOT_FOUND)
-
+        
         # Serialize the patient data
         serializer = PatientSerializer(patients, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -150,6 +152,15 @@ def store_survey(request):
                 personalCare=personal_care,
                 createDate=createDate
             )
+            patients = Patient.objects.filter(patientId=patient_id)
+            if not patients.exists():
+                return Response({"error": "No patients found for the given patientId"}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                patient = patients.first()
+                new_cdr_value = round(random.uniform(0, 3), 2)
+                patient.cdrId = new_cdr_value
+                patient.save()
+            # patients.save(update_fields=['cdrId'])        
             # Return success response
             return JsonResponse({'message': 'Survey data saved successfully'}, status=201)
 

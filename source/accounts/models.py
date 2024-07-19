@@ -9,9 +9,15 @@ class Patient(models.Model):
     emergencyContact = models.CharField(max_length=100,null=True)
     caretakerId = models.CharField(max_length=50, default='',null=True) 
     pincode = models.CharField(max_length=20,null=True)
+    cdrId = models.FloatField(max_length=20,null=True)
 
     def __str__(self):
         return str(self.name)
+    
+    def save(self, *args, **kwargs):
+        # Ensure createDate is formatted as dd-mm-yyyy before saving
+        # self.createDate = datetime.datetime.now().strftime('%d-%m-%Y')
+        super().save(*args, **kwargs)
 
 class Activation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
