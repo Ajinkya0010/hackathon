@@ -140,6 +140,17 @@ def store_survey(request):
 
     return HttpResponseNotAllowed(['POST'])
 
+
+def convert_to_epoch(date_string):
+    # Parse the date string into a datetime object
+    date_format = "%Y-%m-%d"  # Define the format of the input date string
+    date_obj = datetime.datetime.strptime(date_string, date_format)
+   
+    # Convert the datetime object to epoch time
+    epoch_time = int(date_obj.timestamp())
+   
+    return epoch_time
+
 @csrf_exempt
 def get_survey_data(request):
     if request.method == 'GET':
@@ -155,10 +166,11 @@ def get_survey_data(request):
             # Prepare response data
             survey_data = []
             for survey in surveys:
+                create_date_str = survey.createDate.strftime('%Y-%m-%d')
                 survey_data.append({
-                    # 'patientId': survey.patientId,
+                    'patientId': survey.patientId,
                     'cdrValue': survey.cdrValues,
-                    'createDate': survey.createDate.strftime('%Y-%m-%d')  # Format date as dd-mm-yyyy
+                    'createDate'  :   convert_to_epoch(create_date_str)
                 })
 
             # Return JSON response with survey data
